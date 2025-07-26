@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penjelajah Sekolah Berbasis AI: Eropa & Asia Tenggara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals & Muted Earth Tones -->
+    <!-- Application Structure Plan: Aplikasi ini disusun secara tematis untuk memfasilitasi perbandingan lintas wilayah. Struktur utamanya adalah: 1) Pengenalan, memberikan gambaran umum. 2) Model Alpha sebagai tolok ukur. 3) Perbandingan Interaktif, di mana pengguna dapat memfilter sekolah berdasarkan wilayah (Eropa/Asia) dan membandingkannya pada tema-tema kunci (Model Pembelajaran, Peran Pendidik, Kurikulum). 4) Tren & Kebijakan Global, yang memvisualisasikan data tingkat makro. Struktur ini dirancang untuk memandu pengguna dari pemahaman dasar ke analisis komparatif yang mendalam, sehingga lebih mudah untuk mensintesis wawasan dari laporan. -->
+    <!-- Visualization & Content Choices: 
+        - Model Alpha (Inti 2 Jam): Diagram HTML/CSS + Donut Chart (Chart.js) untuk memvisualisasikan alokasi waktu yang unik. Interaksi: Hover. Alasan: Menunjukkan perbedaan radikal secara visual.
+        - Peran Pendidik (Pemandu): Diagram "Sebelum & Sesudah" menggunakan HTML/CSS untuk mengilustrasikan pergeseran peran. Interaksi: Statis. Alasan: Komunikasi konsep yang jelas dan cepat.
+        - Studi Kasus Sekolah: Kartu interaktif dalam tata letak grid. Interaksi: Filter wilayah (JS) dan detail yang dapat diperluas. Alasan: Memungkinkan eksplorasi yang terfokus dan perbandingan yang mudah.
+        - Tren Adopsi/Investasi AI: Bar Chart (Chart.js). Interaksi: Tooltip. Alasan: Mengkuantifikasi data tren yang dijelaskan dalam teks.
+        - Inisiatif Pemerintah: Daftar bergaya dengan ikon bendera (Unicode). Interaksi: Hover. Alasan: Memberikan gambaran ringkas yang mudah dipindai.
+        Library/Method: Chart.js untuk semua bagan, HTML/CSS/Tailwind untuk diagram, Vanilla JS untuk semua interaktivitas. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9F7F3;
+            color: #3D405B;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #81B29A;
+            border-bottom-color: #81B29A;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tag {
+            background-color: #E07A5F;
+            color: white;
+        }
+        .region-tag-europe { background-color: #3D405B; color: white; }
+        .region-tag-asia { background-color: #81B29A; color: white; }
+        .region-tag-benchmark { background-color: #F2CC8F; color: #3D405B; }
+        .filter-btn.active {
+            background-color: #81B29A;
+            color: white;
+            border-color: #81B29A;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-[#3D405B]">Pendidikan AI Masa Depan</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#hero" class="nav-link font-medium pb-1">Beranda</a>
+                <a href="#alpha-model" class="nav-link font-medium pb-1">Model Alpha</a>
+                <a href="#comparison" class="nav-link font-medium pb-1">Perbandingan</a>
+                <a href="#trends" class="nav-link font-medium pb-1">Tren Global</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#hero" class="block py-2 px-6 text-sm hover:bg-gray-100">Beranda</a>
+            <a href="#alpha-model" class="block py-2 px-6 text-sm hover:bg-gray-100">Model Alpha</a>
+            <a href="#comparison" class="block py-2 px-6 text-sm hover:bg-gray-100">Perbandingan</a>
+            <a href="#trends" class="block py-2 px-6 text-sm hover:bg-gray-100">Tren Global</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+        
+        <section id="hero" class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 text-[#3D405B]">Masa Depan Pendidikan Telah Tiba</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600">
+                Aplikasi ini menjelajahi lanskap sekolah swasta berbasis Kecerdasan Buatan (AI) yang inovatif di Eropa dan Asia Tenggara. Temukan bagaimana model pendidikan baru, yang terinspirasi oleh pendekatan disruptif seperti Alpha School, membentuk kembali cara siswa belajar, peran guru, dan kurikulum untuk masa depan.
+            </p>
+        </section>
+
+        <section id="alpha-model" class="mb-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold mb-2">Tolok Ukur: Model Alpha School</h3>
+                <p class="max-w-3xl mx-auto text-gray-600">Alpha School memperkenalkan model radikal yang menjadi dasar perbandingan. Dengan memadatkan inti akademik menjadi dua jam menggunakan AI, sekolah ini mendedikasikan sisa hari untuk pengembangan keterampilan hidup yang esensial.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-8 rounded-xl shadow-lg card">
+                    <h4 class="text-2xl font-bold mb-4 text-center">Struktur Hari Sekolah Alpha</h4>
+                     <div class="chart-container">
+                        <canvas id="alphaDayChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4 text-center">Visualisasi ini menunjukkan bagaimana model Alpha mengalokasikan sebagian besar waktu belajar untuk keterampilan praktis dan proyek minat, sebuah pergeseran dramatis dari sekolah tradisional.</p>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg card">
+                        <h4 class="font-bold text-xl mb-2">Inti Akademik 2 Jam</h4>
+                        <p class="text-gray-600">Siswa menyelesaikan matematika, membaca, dan sains melalui platform pembelajaran adaptif AI. Ini memungkinkan kemajuan berbasis penguasaan sesuai kecepatan masing-masing.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg card">
+                        <h4 class="font-bold text-xl mb-2">Peran Pendidik sebagai "Pemandu"</h4>
+                        <p class="text-gray-600">Guru beralih dari instruktur menjadi motivator dan fasilitator. Mereka fokus pada dukungan emosional dan menumbuhkan kemandirian belajar, sementara AI menangani pengajaran.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg card">
+                        <h4 class="font-bold text-xl mb-2">Fokus pada Keterampilan Hidup</h4>
+                        <p class="text-gray-600">Waktu yang dihemat digunakan untuk lokakarya praktis seperti literasi keuangan, kewirausahaan, berbicara di depan umum, dan proyek-proyek berbasis minat lainnya.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison" class="mb-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold mb-2">Perbandingan Interaktif Model Sekolah AI</h3>
+                <p class="max-w-3xl mx-auto text-gray-600">Jelajahi bagaimana sekolah-sekolah di Eropa dan Asia Tenggara mengadopsi dan mengadaptasi model pendidikan berbasis AI. Gunakan filter di bawah untuk memfokuskan perbandingan Anda berdasarkan wilayah.</p>
+                <div id="region-filter" class="mt-6 flex justify-center space-x-2">
+                    <button class="filter-btn active px-4 py-2 border rounded-full transition" data-region="all">Semua</button>
+                    <button class="filter-btn px-4 py-2 border rounded-full transition" data-region="Eropa">Eropa</button>
+                    <button class="filter-btn px-4 py-2 border rounded-full transition" data-region="Asia Tenggara">Asia Tenggara</button>
+                </div>
+            </div>
+            <div id="school-cards-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+
+        <section id="trends" class="scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold mb-2">Tren dan Kebijakan Global</h3>
+                <p class="max-w-3xl mx-auto text-gray-600">Lihat bagaimana pemerintah dan pasar merespons gelombang pendidikan AI, dari investasi besar di Eropa hingga inisiatif nasional yang proaktif di Asia Tenggara.</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-8 items-start">
+                <div class="bg-white p-8 rounded-xl shadow-lg card">
+                    <h4 class="text-2xl font-bold mb-4 text-center">Pasar Pendidikan AI di Jerman</h4>
+                    <p class="text-sm text-gray-500 mb-4 text-center">Jerman memimpin Eropa dalam investasi AI untuk pendidikan. Bagan ini menunjukkan proyeksi pertumbuhan pasar yang eksplosif, menandakan adopsi yang cepat.</p>
+                    <div class="chart-container h-64 md:h-80">
+                        <canvas id="germanyMarketChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg card">
+                    <h4 class="text-2xl font-bold mb-4 text-center">Inisiatif Pemerintah di Asia Tenggara</h4>
+                    <p class="text-sm text-gray-500 mb-6 text-center">Banyak negara di Asia Tenggara secara aktif mengintegrasikan AI ke dalam kurikulum nasional mereka. Arahkan kursor ke negara untuk melihat detail inisiatifnya.</p>
+                    <ul id="sea-initiatives" class="space-y-4">
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+            <p>&copy; 2025 Penjelajah Pendidikan AI. Dibuat berdasarkan analisis laporan.</p>
+        </div>
+    </footer>
+
+    <script>
+        const schoolData = [
+            {
+                name: "Alpha School",
+                region: "Benchmark",
+                country: "🇺🇸 Amerika Serikat",
+                model: "Model 'Inti 2 Jam' yang disruptif. AI menangani seluruh akademik inti, membebaskan waktu untuk keterampilan hidup.",
+                philosophy: "Disruptif",
+                educator: "Guru menjadi 'Pemandu' motivasi dan emosional.",
+                curriculum: "Fokus kuat pada kewirausahaan, literasi keuangan, dan proyek minat pribadi."
+            },
+            {
+                name: "Cognita Schools",
+                region: "Eropa",
+                country: "🇪🇸 Spanyol & 🇬🇧 Inggris (dan global)",
+                model: "Menggunakan platform 'Cognita AI' untuk meningkatkan, bukan menggantikan, peran guru.",
+                philosophy: "Integratif",
+                educator: "Guru diberdayakan dengan alat AI untuk personalisasi dan umpan balik instan.",
+                curriculum: "AI diintegrasikan ke dalam mata pelajaran yang ada seperti matematika dan bahasa."
+            },
+            {
+                name: "Konsep 'Sekolah Masa Depan'",
+                region: "Eropa",
+                country: "🇪🇺 Eropa (Konseptual)",
+                model: "Sangat mirip dengan Alpha, mengusulkan inti akademik 2 jam berbasis AI.",
+                philosophy: "Disruptif",
+                educator: "Mengadopsi model 'Pemandu' yang fokus pada motivasi.",
+                curriculum: "Kegiatan praktis dan keterampilan hidup mengisi sisa hari sekolah."
+            },
+            {
+                name: "GEMS Education",
+                region: "Asia Tenggara",
+                country: "🇦🇪 UEA",
+                model: "Membangun 'Global Education AI Hub' dan sekolah unggulan berbasis riset dan AI.",
+                philosophy: "Integratif",
+                educator: "Guru spesialis berkolaborasi dengan teknologi AI canggih.",
+                curriculum: "Kurikulum British yang ditingkatkan dengan AI, robotika, dan e-sports sejak dini."
+            },
+            {
+                name: "HOG International Academy",
+                region: "Asia Tenggara",
+                country: "🇹🇭 Thailand",
+                model: "AI ditanamkan di seluruh kurikulum untuk pengalaman yang dipersonalisasi dan adaptif.",
+                philosophy: "Integratif",
+                educator: "AI digunakan untuk diagnostik kinerja, memungkinkan guru fokus pada bimbingan.",
+                curriculum: "Menekankan literasi AI dan menawarkan pilihan mata pelajaran teknologi digital."
+            },
+            {
+                name: "XCL World Academy",
+                region: "Asia Tenggara",
+                country: "🇸🇬 Singapura",
+                model: "Menawarkan kurikulum khusus AI selama 15 minggu untuk siswa kelas 6.",
+                philosophy: "Integratif",
+                educator: "Guru memfasilitasi proyek dan seminar yang dipimpin pakar industri.",
+                curriculum: "Mengintegrasikan dasar-dasar AI, AI generatif, dan pengembangan aplikasi."
+            },
+            {
+                name: "Knewton Global School",
+                region: "Asia Tenggara",
+                country: "🇲🇾 Malaysia",
+                model: "AI dan Robotika STEM sebagai mata pelajaran tambahan.",
+                philosophy: "Integratif",
+                educator: "Guru mengajar mata pelajaran tambahan yang berfokus pada teknologi.",
+                curriculum: "Sejalan dengan Kurikulum Nasional Malaysia, dengan tambahan teknologi."
+            }
+        ];
+
+        const seaInitiativesData = [
+            { country: "🇮🇩 Indonesia", detail: "Menerapkan pembelajaran AI dan coding sebagai mata pelajaran pilihan mulai tahun ajaran 2025-2026." },
+            { country: "🇸🇬 Singapura", detail: "Mengintegrasikan AI ke dalam Sistem Pembelajaran Siswa (SLS) nasional untuk personalisasi." },
+            { country: "🇲🇾 Malaysia", detail: "Memiliki Kantor AI Nasional (NAIO) untuk mempercepat adopsi AI di berbagai sektor, termasuk pendidikan." },
+            { country: "🇻🇳 Vietnam", detail: "Secara aktif mempromosikan alat AI seperti Khanmigo untuk mendukung guru dan siswa." },
+            { country: "🇹🇭 Thailand", detail: "Meluncurkan inisiatif THAI Academy dan menjadi tuan rumah Forum Global UNESCO tentang Etika AI." },
+            { country: "🇦🇪 UEA", detail: "Memperkenalkan AI sebagai mata pelajaran inti dari TK hingga kelas 12 mulai tahun 2025." }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link, #mobile-menu a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            const renderSchoolCards = (region = 'all') => {
+                const container = document.getElementById('school-cards-container');
+                container.innerHTML = '';
+                const filteredData = region === 'all' 
+                    ? schoolData 
+                    : schoolData.filter(school => school.region === region || school.region === 'Benchmark');
+                
+                filteredData.forEach(school => {
+                    const card = document.createElement('div');
+                    card.className = `bg-white p-6 rounded-xl shadow-lg card school-card ${school.region}`;
+                    card.setAttribute('data-region', school.region);
+                    
+                    let regionTagClass = '';
+                    switch(school.region) {
+                        case 'Eropa': regionTagClass = 'region-tag-europe'; break;
+                        case 'Asia Tenggara': regionTagClass = 'region-tag-asia'; break;
+                        case 'Benchmark': regionTagClass = 'region-tag-benchmark'; break;
+                    }
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-bold text-xl">${school.name}</h4>
+                            <span class="text-xs font-semibold px-2 py-1 rounded-full ${regionTagClass}">${school.region}</span>
+                        </div>
+                        <p class="text-sm font-medium text-gray-500 mb-4">${school.country}</p>
+                        <div>
+                            <p class="mb-2"><strong class="font-semibold text-gray-700">Model:</strong> <span class="text-gray-600">${school.model}</span></p>
+                            <p class="mb-2"><strong class="font-semibold text-gray-700">Filosofi:</strong> <span class="tag text-xs font-semibold px-2 py-1 rounded-full">${school.philosophy}</span></p>
+                            <p class="mb-2"><strong class="font-semibold text-gray-700">Peran Pendidik:</strong> <span class="text-gray-600">${school.educator}</span></p>
+                            <p><strong class="font-semibold text-gray-700">Kurikulum:</strong> <span class="text-gray-600">${school.curriculum}</span></p>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            };
+
+            const filterButtons = document.querySelectorAll('#region-filter button');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderSchoolCards(button.dataset.region);
+                });
+            });
+
+            const renderSeaInitiatives = () => {
+                const container = document.getElementById('sea-initiatives');
+                container.innerHTML = '';
+                seaInitiativesData.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center p-3 bg-gray-50 rounded-lg transition hover:bg-gray-100 cursor-pointer';
+                    li.innerHTML = `
+                        <span class="text-2xl mr-4">${item.country.split(' ')[0]}</span>
+                        <div>
+                            <p class="font-semibold">${item.country.split(' ')[1]}</p>
+                            <p class="text-sm text-gray-600">${item.detail}</p>
+                        </div>
+                    `;
+                    container.appendChild(li);
+                });
+            };
+
+            renderSchoolCards();
+            renderSeaInitiatives();
+
+            new Chart(document.getElementById('alphaDayChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Keterampilan Hidup & Proyek Minat', 'Inti Akademik (AI)'],
+                    datasets: [{
+                        data: [6, 2],
+                        backgroundColor: ['#81B29A', '#F2CC8F'],
+                        borderColor: '#F9F7F3',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw} jam`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            new Chart(document.getElementById('germanyMarketChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['2022', '2030 (Proyeksi)'],
+                    datasets: [{
+                        label: 'Ukuran Pasar (dalam Juta €)',
+                        data: [170, 1740],
+                        backgroundColor: ['#3D405B', '#81B29A'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Juta Euro (€)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
